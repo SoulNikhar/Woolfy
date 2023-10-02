@@ -10,6 +10,7 @@ import PrivateComponents from "./components/PrivateComponents";
 import Login from "./components/Login";
 
 const App = () => {
+  let auth = localStorage.getItem("user");
   return (
     <div>
       <div className="navbar">

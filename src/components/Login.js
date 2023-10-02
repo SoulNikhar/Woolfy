@@ -9,27 +9,27 @@ const Login = () => {
   const navigator = useNavigate();
 
   const handleLogin = async () => {
-    console.warn(email , password);
+    console.warn(email, password);
     if (email !== "" && password !== "") {
-        let result = await fetch("http://localhost:5000/login", {
-          method: "post",
-          body: JSON.stringify({ email, password }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-  
-         result = await result.json();
-        console.log(result);
-        if (result.email) {
-          localStorage.setItem("user" , JSON.stringify(result))
-          navigator("/home");
-        } else {
-          alert("Entered Invalid Information ");
-        }
+      let result = await fetch("http://localhost:5000/login", {
+        method: "post",
+        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      result = await result.json();
+      console.log(result);
+      if (result.email) {
+        localStorage.setItem("user", JSON.stringify(result));
+        navigator("/home");
+      } else {
+        alert("Entered Invalid Information ");
+      }
     }
   };
-  
+
   return (
     <div className="signup">
       <h1>Login</h1>
@@ -69,7 +69,17 @@ const Login = () => {
         <button type="button" onClick={handleLogin}>
           Sign Up
         </button>
-        <p> Create an new account  ?? <a onClick={()=>{navigator("/signup")}}>Click Here for signUp</a> </p>
+        <p>
+          {" "}
+          Create an new account ??{" "}
+          <a
+            onClick={() => {
+              navigator("/signup");
+            }}
+          >
+            Click Here for signUp
+          </a>{" "}
+        </p>
       </div>
     </div>
   );

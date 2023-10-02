@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SignUp.css";
 const SignUp = () => {
@@ -8,12 +8,12 @@ const SignUp = () => {
   const navigator = useNavigate();
 
   //  ------------ Already SignUp --------------
-  // useEffect(() => {
-  //   const auth = localStorage.getItem("user");
-  //   if (auth) {
-  //     navigator("/");
-  //   }
-  // });
+  useEffect(() => {
+    const auth = localStorage.getItem("user");
+    if (auth) {
+      navigator("/");
+    }
+  });
 
   const collectData = async () => {
     console.log("this is from collection ");
