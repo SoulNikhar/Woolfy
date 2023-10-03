@@ -5,6 +5,7 @@ const SignUp = () => {
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [category, setcategory] = useState("");
   const navigator = useNavigate();
 
   //  ------------ Already SignUp --------------
@@ -18,10 +19,10 @@ const SignUp = () => {
   const collectData = async () => {
     console.log("this is from collection ");
     //  ----------- ------ MongoDb connection -----------------
-    if (name !== "" && email !== "" && password !== "") {
+    if (name !== "" && email !== "" && password !== "" && category!="") {
       let result = await fetch("http://localhost:5000/signup", {
         method: "post",
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password , category }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -36,6 +37,7 @@ const SignUp = () => {
 
       navigator("/");
     } else {
+      alert("please Enter all required fields ");
       navigator("/signup");
     }
   };
@@ -79,6 +81,14 @@ const SignUp = () => {
               setpassword(e.target.value);
             }}
           />
+        </p>
+        <p>
+          Farmer:
+          <input type="radio" value="Farmer" name="categories"  onClick={()=>{setcategory("farmer")}}/>
+          Processor:
+          <input type="radio" value="processor" name="categories" onClick={()=>{setcategory("processor")}} />
+          Buyer:
+          <input type="radio" value="buyer" name="categories" onClick={()=>{setcategory("buyer")}} />
         </p>
         <button type="button" onClick={collectData}>
           Sign Up

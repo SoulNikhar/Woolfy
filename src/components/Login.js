@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
-  // const [category, setcategory] = useState("");
   const navigator = useNavigate();
 
   const handleLogin = async () => {
@@ -23,7 +22,15 @@ const Login = () => {
       console.log(result);
       if (result.email) {
         localStorage.setItem("user", JSON.stringify(result));
-        navigator("/home");
+        let category = result.category;
+        category === "farmer" ? (
+          navigator("/producerdashboard")
+        ) : category === "buyer" ? (
+          navigator("/buyerdashboard")
+        ) : (
+          navigator("/processordashboard")
+        )
+        
       } else {
         alert("Entered Invalid Information ");
       }
@@ -58,27 +65,19 @@ const Login = () => {
             }}
           />
         </p>
-        {/* <p>
-          Farmer:
-          <input type="radio" value="Farmer" name="categories"  onClick={()=>{setcategory("farmer")}}/>
-          Processor:
-          <input type="radio" value="processor" name="categories" onClick={()=>{setcategory("processor")}} />
-          Buyer:
-          <input type="radio" value="buyer" name="categories" onClick={()=>{setcategory("buyer")}} />
-        </p> */}
         <button type="button" onClick={handleLogin}>
           Sign Up
         </button>
         <p>
-          {" "}
-          Create an new account ??{" "}
+           
+          Create an new account ?? 
           <a
             onClick={() => {
               navigator("/signup");
             }}
           >
             Click Here for signUp
-          </a>{" "}
+          </a> 
         </p>
       </div>
     </div>
