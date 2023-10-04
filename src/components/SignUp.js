@@ -6,7 +6,7 @@ const SignUp = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [category, setCategory] = useState("farmer"); // Default category is "farmer"
+  const [category, setCategory] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [gender, setGender] = useState("");
   const [nationalID, setNationalID] = useState("");
@@ -14,7 +14,7 @@ const SignUp = () => {
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [zipCode, setZipCode] = useState("");
+  const [pinCode, setpinCode] = useState("");
   const [country, setCountry] = useState("");
   const [farmName, setFarmName] = useState("");
   const [farmLocation, setFarmLocation] = useState("");
@@ -24,9 +24,10 @@ const SignUp = () => {
   const [processingFacilities, setProcessingFacilities] = useState("");
   const [productionPractices, setProductionPractices] = useState("");
   const [specializations, setSpecializations] = useState([]);
+
   const navigator = useNavigate();
 
-  // ------------ Already Signed Up --------------
+  // Already Signed Up
   useEffect(() => {
     const auth = localStorage.getItem("user");
     if (auth) {
@@ -34,38 +35,45 @@ const SignUp = () => {
     }
   });
 
-  const handleCategoryChange = (event) => {
-    setCategory(event.target.value);
-  };
-
-  const handleSpecializationChange = (event) => {
-    setSpecializations(event.target.value.split(",").map((s) => s.trim()));
+  const handleSpecializationChange = (e) => {
+    setSpecializations(e.target.value.split(","));
   };
 
   const collectData = async () => {
-    console.log("this is from collection ");
-    // ----------- MongoDB connection -----------------
+    // MongoDB connection
     if (
-      name !== "" &&
-      email !== "" &&
-      password !== "" &&
-      category !== "" &&
-      dateOfBirth !== "" &&
-      gender !== "" &&
-      nationalID !== "" &&
-      phoneNumber !== "" &&
-      street !== "" &&
-      city !== "" &&
-      state !== "" &&
-      zipCode !== "" &&
-      country !== "" &&
-      farmName !== "" &&
-      farmLocation !== "" &&
-      farmSize !== "" &&
-      farmingActivities !== "" &&
-      experienceYears !== "" &&
-      processingFacilities !== "" &&
-      productionPractices !== ""
+      category === "farmer"
+        ? name !== "" &&
+          email !== "" &&
+          password !== "" &&
+          category !== "" &&
+          dateOfBirth !== "" &&
+          gender !== "" &&
+          nationalID !== "" &&
+          phoneNumber !== "" &&
+          street !== "" &&
+          city !== "" &&
+          state !== "" &&
+          pinCode !== "" &&
+          country !== "" &&
+          farmName !== "" &&
+          farmLocation !== "" &&
+          farmSize !== "" &&
+          farmingActivities !== "" &&
+          experienceYears !== ""
+        : name !== "" &&
+          email !== "" &&
+          password !== "" &&
+          category !== "" &&
+          dateOfBirth !== "" &&
+          gender !== "" &&
+          nationalID !== "" &&
+          phoneNumber !== "" &&
+          street !== "" &&
+          city !== "" &&
+          state !== "" &&
+          pinCode !== "" &&
+          country !== ""
     ) {
       const userData = {
         name,
@@ -83,29 +91,46 @@ const SignUp = () => {
             street,
             city,
             state,
-            zipCode,
+            pinCode,
             country,
           },
         },
-        farmInfo: {
-          farmName,
-          farmLocation,
-          farmSize,
-          farmingActivities,
-          experienceYears,
-        },
-        woolInfo: {},
       };
-
-      // Include woolInfo only for the "farmer" category
-      if (category === "farmer") {
+      if (category === "buyer" || category === "producer") {
+        userData.farmInfo = {
+          farmName: null,
+          farmLocation: null,
+          farmSize: null,
+          farmingActivities: null,
+          experienceYears: null,
+        };
         userData.woolInfo = {
-          processingFacilities,
-          productionPractices,
-          specializations,
+          animalType: null,
+          animalCount: null,
+          processingFacilities: null,
+          productionPractices: null,
+          specializations: [],
         };
       }
 
+      if (category === "farmer") {
+        userData.farmInfo = {
+          farmName,
+          farmLocation,
+          farmSize: Number(farmSize),
+          farmingActivities,
+          experienceYears: Number(experienceYears),
+          woolInfo: {
+            animalType: "",
+            animalCount: 0,
+            processingFacilities,
+            productionPractices,
+            specializations,
+          },
+        };
+      }
+
+      // Send userData to the server
       let result = await fetch("http://localhost:5000/signup", {
         method: "post",
         body: JSON.stringify(userData),
@@ -113,17 +138,15 @@ const SignUp = () => {
           "Content-Type": "application/json",
         },
       });
-
       result = await result.json();
 
-      // --------------------Local Storage------------------
+      // Local Storage
       localStorage.setItem("user", JSON.stringify(result));
 
-      // ---------------- Render to Home page -----------------
+      // Render to Home page
       navigator("/");
     } else {
       alert("Please enter all required fields");
-      navigator("/signup");
     }
   };
 
@@ -141,7 +164,7 @@ const SignUp = () => {
             onChange={(e) => {
               setName(e.target.value);
             }}
-          />
+          ></input>
         </div>
         <p>Email:</p>
         <div>
@@ -153,7 +176,7 @@ const SignUp = () => {
             onChange={(e) => {
               setEmail(e.target.value);
             }}
-          />
+          ></input>
         </div>
         <p>Password:</p>
         <div>
@@ -169,10 +192,17 @@ const SignUp = () => {
         </div>
         <p>Category:</p>
         <div>
-          <select value={category} onChange={handleCategoryChange}>
+          <select
+            className="inputBox"
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+            }}
+          >
+            <option value="">Select Category</option>
             <option value="farmer">Farmer</option>
             <option value="buyer">Buyer</option>
-            <option value="seller">Seller</option>
+            <option value="producer">producer</option>
           </select>
         </div>
         <p>Date of Birth:</p>
@@ -180,6 +210,7 @@ const SignUp = () => {
           <input
             className="inputBox"
             type="date"
+            placeholder="Date of Birth"
             value={dateOfBirth}
             onChange={(e) => {
               setDateOfBirth(e.target.value);
@@ -188,15 +219,17 @@ const SignUp = () => {
         </div>
         <p>Gender:</p>
         <div>
-          <input
+          <select
             className="inputBox"
-            type="text"
-            placeholder="Enter Gender"
             value={gender}
             onChange={(e) => {
               setGender(e.target.value);
             }}
-          />
+          >
+            <option value="">Select Gender</option>
+            <option value="male">male</option>
+            <option value="female">female</option>
+          </select>
         </div>
         <p>National ID:</p>
         <div>
@@ -261,9 +294,9 @@ const SignUp = () => {
             className="inputBox"
             type="text"
             placeholder="Zip Code"
-            value={zipCode}
+            value={pinCode}
             onChange={(e) => {
-              setZipCode(e.target.value);
+              setpinCode(e.target.value);
             }}
           />
         </div>
@@ -278,68 +311,68 @@ const SignUp = () => {
             }}
           />
         </div>
-        <p>Farm Name:</p>
-        <div>
-          <input
-            className="inputBox"
-            type="text"
-            placeholder="Enter Farm Name"
-            value={farmName}
-            onChange={(e) => {
-              setFarmName(e.target.value);
-            }}
-          />
-        </div>
-        <p>Farm Location:</p>
-        <div>
-          <input
-            className="inputBox"
-            type="text"
-            placeholder="Enter Farm Location"
-            value={farmLocation}
-            onChange={(e) => {
-              setFarmLocation(e.target.value);
-            }}
-          />
-        </div>
-        <p>Farm Size (Acres):</p>
-        <div>
-          <input
-            className="inputBox"
-            type="number"
-            placeholder="Enter Farm Size"
-            value={farmSize}
-            onChange={(e) => {
-              setFarmSize(e.target.value);
-            }}
-          />
-        </div>
-        <p>Farming Activities:</p>
-        <div>
-          <input
-            className="inputBox"
-            type="text"
-            placeholder="Enter Farming Activities"
-            value={farmingActivities}
-            onChange={(e) => {
-              setFarmingActivities(e.target.value);
-            }}
-          />
-        </div>
-        <p>Experience Years:</p>
-        <div>
-          <input
-            className="inputBox"
-            type="number"
-            placeholder="Enter Experience Years"
-            value={experienceYears}
-            onChange={(e) => {
-              setExperienceYears(e.target.value);
-            }}
-          />
-        </div>
         {category === "farmer" && (
-          <div>
+          <>
+            <p>Farm Name:</p>
+            <div>
+              <input
+                className="inputBox"
+                type="text"
+                placeholder="Enter Farm Name"
+                value={farmName}
+                onChange={(e) => {
+                  setFarmName(e.target.value);
+                }}
+              />
+            </div>
+            <p>Farm Location:</p>
+            <div>
+              <input
+                className="inputBox"
+                type="text"
+                placeholder="Enter Farm Location"
+                value={farmLocation}
+                onChange={(e) => {
+                  setFarmLocation(e.target.value);
+                }}
+              />
+            </div>
+            <p>Farm Size (in acres):</p>
+            <div>
+              <input
+                className="inputBox"
+                type="number"
+                placeholder="Enter Farm Size"
+                value={farmSize}
+                onChange={(e) => {
+                  setFarmSize(e.target.value);
+                }}
+              />
+            </div>
+            <p>Farming Activities:</p>
+            <div>
+              <input
+                className="inputBox"
+                type="text"
+                placeholder="Enter Farming Activities"
+                value={farmingActivities}
+                onChange={(e) => {
+                  setFarmingActivities(e.target.value);
+                }}
+              />
+            </div>
+            <p>Experience Years:</p>
+            <div>
+              <input
+                className="inputBox"
+                type="number"
+                placeholder="Enter Experience Years"
+                value={experienceYears}
+                onChange={(e) => {
+                  setExperienceYears(e.target.value);
+                }}
+              />
+            </div>
             <p>Processing Facilities:</p>
             <div>
               <input
@@ -374,7 +407,7 @@ const SignUp = () => {
                 onChange={handleSpecializationChange}
               />
             </div>
-          </div>
+          </>
         )}
         <button type="button" onClick={collectData}>
           Sign Up
